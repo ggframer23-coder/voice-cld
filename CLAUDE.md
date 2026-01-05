@@ -24,6 +24,43 @@ After comparing whisper.cpp, original Whisper, and faster-whisper:
 
 Note: whisper.cpp would be faster on Apple Silicon with CoreML, but this project targets Intel CPUs.
 
+## Chat Log Maintenance (For Claude Code)
+
+**IMPORTANT:** When working with Claude Code on this project, maintain a conversation log for context continuity.
+
+### Instructions:
+1. **Append all conversations** to `chat_<date>.md` (e.g., `chat_2026-01-04.md`)
+2. **Format:** Use markdown with clear sections for different topics/tasks
+3. **Content:** Include user requests, assistant actions, decisions made, and rationale
+4. **Local only:** Chat logs are in `.gitignore` and should NOT be committed to git
+5. **Daily files:** Create new file each day with date in filename
+
+### Example Structure:
+```markdown
+# Chat Log - YYYY-MM-DD
+
+## Topic/Task Name
+
+**User:** [user request]
+
+**Assistant Actions:**
+- Action taken
+- Files modified
+- Decisions made
+
+**Outcome:** [result]
+
+---
+```
+
+### When to Update:
+- After completing significant tasks
+- When user requests "save chat" or similar
+- At natural breakpoints in conversation
+- When making important architectural decisions
+
+This ensures continuity across Claude Code sessions and provides a development history for the project.
+
 ## Project Architecture
 
 ```
