@@ -54,3 +54,4 @@ Thumbs.db
 
 # Claude
 .claude/
+chat_*.md
