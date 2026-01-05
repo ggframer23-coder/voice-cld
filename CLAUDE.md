@@ -87,13 +87,41 @@ voice/
 ├── tests/
 │   └── test_transcriber.py
 ├── pyproject.toml
+├── Makefile
 ├── README.md
+├── CLAUDE.md
 └── .gitignore
 ```
 
 ## Development Commands
 
-### Setup
+**Quick Start with Makefile:**
+
+```bash
+# Show all available commands
+make help
+
+# Install and setup
+make install        # Production dependencies
+make install-dev    # Development dependencies
+
+# Transcribe audio
+make run FILE=audio.mp3 MODEL=small
+make batch DIR=/path/to/audio/
+make watch DIR=/path/to/audio/
+
+# Development
+make test           # Run tests
+make format         # Format code
+make lint           # Lint code
+make check          # Run all checks
+
+# Cleanup
+make clean          # Remove cache
+make clean-all      # Full cleanup
+```
+
+### Manual Setup (Alternative)
 
 ```bash
 # Create virtual environment
