@@ -36,6 +36,9 @@ ENV/
 # Whisper models cache
 models/
 
+# Audio files (test data, uploads)
+audio/
+
 # FAISS index and embeddings (can regenerate)
 transcripts/metadata/faiss_index.bin
 transcripts/metadata/id_mapping.json
