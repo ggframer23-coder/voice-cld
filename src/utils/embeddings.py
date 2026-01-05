@@ -2,6 +2,10 @@
 
 from typing import List
 import numpy as np
+from sentence_transformers import SentenceTransformer
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class EmbeddingGenerator:
@@ -18,8 +22,10 @@ class EmbeddingGenerator:
 
     def load_model(self):
         """Load the embedding model."""
-        # TODO: Implement model loading
-        pass
+        if self.model is None:
+            logger.info(f"Loading embedding model: {self.model_name}")
+            self.model = SentenceTransformer(self.model_name)
+            logger.info("Embedding model loaded")
 
     def encode(self, texts: List[str]) -> np.ndarray:
         """Generate embeddings for texts.
@@ -30,9 +36,11 @@ class EmbeddingGenerator:
         Returns:
             Numpy array of embeddings (N x dimension)
         """
-        # TODO: Implement encoding
-        # For now, return dummy embeddings
-        return np.zeros((len(texts), 384))
+        if self.model is None:
+            self.load_model()
+
+        embeddings = self.model.encode(texts, show_progress_bar=False)
+        return np.array(embeddings)
 
     def encode_single(self, text: str) -> np.ndarray:
         """Generate embedding for single text.

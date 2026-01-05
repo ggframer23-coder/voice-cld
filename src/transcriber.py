@@ -2,6 +2,10 @@
 
 from typing import Optional, Dict, List, Any
 from pathlib import Path
+from faster_whisper import WhisperModel
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class Transcriber:
@@ -30,8 +34,17 @@ class Transcriber:
 
     def load_model(self):
         """Load the Whisper model."""
-        # TODO: Implement model loading with faster-whisper
-        pass
+        if self.model is None:
+            logger.info(
+                f"Loading {self.model_size} model (device={self.device}, "
+                f"compute_type={self.compute_type})"
+            )
+            self.model = WhisperModel(
+                self.model_size,
+                device=self.device,
+                compute_type=self.compute_type,
+            )
+            logger.info("Model loaded successfully")
 
     def transcribe(
         self, audio_file: Path, output_format: str = "json"
@@ -45,12 +58,48 @@ class Transcriber:
         Returns:
             Dictionary containing transcription results
         """
-        # TODO: Implement transcription logic
-        return {
-            "text": "",
-            "segments": [],
-            "language": self.language or "en",
+        # Load model if not already loaded
+        if self.model is None:
+            self.load_model()
+
+        logger.info(f"Transcribing: {audio_file}")
+
+        # Perform transcription
+        segments, info = self.model.transcribe(
+            str(audio_file),
+            language=self.language,
+            beam_size=5,
+            vad_filter=True,  # Voice activity detection
+        )
+
+        # Process segments
+        full_text = []
+        segment_list = []
+
+        for segment in segments:
+            full_text.append(segment.text)
+            segment_list.append(
+                {
+                    "start": segment.start,
+                    "end": segment.end,
+                    "text": segment.text.strip(),
+                }
+            )
+
+        result = {
+            "text": " ".join(full_text).strip(),
+            "segments": segment_list,
+            "language": info.language,
+            "language_probability": info.language_probability,
+            "duration": info.duration,
         }
+
+        logger.info(
+            f"Transcription complete: {len(segment_list)} segments, "
+            f"{info.duration:.1f}s, language={info.language}"
+        )
+
+        return result
 
     def transcribe_file(self, audio_file: Path) -> str:
         """Transcribe audio file and return text.

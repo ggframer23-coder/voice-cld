@@ -79,8 +79,42 @@ def format_as_srt(transcription: Dict[str, Any]) -> str:
     Returns:
         Formatted SRT string
     """
-    # TODO: Implement SRT formatting
-    return ""
+    lines = []
+    segments = transcription.get("segments", [])
+
+    for i, segment in enumerate(segments, 1):
+        # Subtitle number
+        lines.append(str(i))
+
+        # Timestamp (00:00:00,000 --> 00:00:00,000)
+        start_time = _format_srt_timestamp(segment["start"])
+        end_time = _format_srt_timestamp(segment["end"])
+        lines.append(f"{start_time} --> {end_time}")
+
+        # Text
+        lines.append(segment["text"])
+
+        # Blank line separator
+        lines.append("")
+
+    return "\n".join(lines)
+
+
+def _format_srt_timestamp(seconds: float) -> str:
+    """Format seconds as SRT timestamp (HH:MM:SS,mmm).
+
+    Args:
+        seconds: Time in seconds
+
+    Returns:
+        Formatted timestamp string
+    """
+    hours = int(seconds // 3600)
+    minutes = int((seconds % 3600) // 60)
+    secs = int(seconds % 60)
+    millis = int((seconds % 1) * 1000)
+
+    return f"{hours:02d}:{minutes:02d}:{secs:02d},{millis:03d}"
 
 
 def save_transcription(

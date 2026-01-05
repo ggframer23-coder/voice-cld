@@ -2,7 +2,10 @@
 
 from pathlib import Path
 from typing import Optional, Tuple
+from mutagen import File as MutagenFile
+import logging
 
+logger = logging.getLogger(__name__)
 
 SUPPORTED_FORMATS = {".mp3", ".wav", ".m4a", ".flac", ".ogg", ".wma"}
 
@@ -28,7 +31,13 @@ def get_audio_duration(file_path: Path) -> Optional[float]:
     Returns:
         Duration in seconds, or None if error
     """
-    # TODO: Implement using mutagen or similar
+    try:
+        audio = MutagenFile(file_path)
+        if audio is not None and hasattr(audio.info, "length"):
+            return float(audio.info.length)
+    except Exception as e:
+        logger.warning(f"Could not get duration for {file_path}: {e}")
+
     return None
 
 
@@ -47,6 +56,20 @@ def validate_audio_file(file_path: Path) -> Tuple[bool, str]:
     if not is_audio_file(file_path):
         return False, f"Unsupported format: {file_path.suffix}"
 
-    # TODO: Add more validation (file size, corruption check, etc.)
+    # Check if file is readable
+    if not file_path.is_file():
+        return False, "Path is not a file"
+
+    # Check file size (should be > 0)
+    if file_path.stat().st_size == 0:
+        return False, "File is empty"
+
+    # Try to read metadata
+    try:
+        audio = MutagenFile(file_path)
+        if audio is None:
+            return False, "Could not read audio file metadata"
+    except Exception as e:
+        return False, f"Corrupted or invalid audio file: {e}"
 
     return True, ""
