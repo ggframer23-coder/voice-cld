@@ -32,7 +32,7 @@ PYTHON := python3
 VENV := .venv
 BIN := $(VENV)/bin
 PYTHON_VENV := $(BIN)/python
-PIP := $(BIN)/pip
+UV := uv
 
 # Model and output settings
 MODEL ?= small
@@ -41,15 +41,17 @@ LANGUAGE ?= auto
 
 # Create virtual environment
 venv:
-	@echo "Creating virtual environment..."
-	$(PYTHON) -m venv $(VENV)
+	@echo "Creating virtual environment with uv..."
+	$(UV) venv $(VENV)
 	@echo "Virtual environment created at $(VENV)"
 
 # Install production dependencies
 install: venv
-	@echo "Installing dependencies..."
-	$(PIP) install --upgrade pip
-	$(PIP) install -e .
+	@echo "Installing dependencies with uv..."
+	@echo "Installing PyTorch (CPU version)..."
+	$(UV) pip install --python $(VENV) torch torchaudio --index-url https://download.pytorch.org/whl/cpu
+	@echo "Installing other dependencies..."
+	$(UV) pip install --python $(VENV) -e .
 	@echo ""
 	@echo "✓ Installation complete!"
 	@echo "  Activate venv: source $(VENV)/bin/activate"
@@ -57,9 +59,11 @@ install: venv
 
 # Install development dependencies
 install-dev: venv
-	@echo "Installing development dependencies..."
-	$(PIP) install --upgrade pip
-	$(PIP) install -e ".[dev]"
+	@echo "Installing development dependencies with uv..."
+	@echo "Installing PyTorch (CPU version)..."
+	$(UV) pip install --python $(VENV) torch torchaudio --index-url https://download.pytorch.org/whl/cpu
+	@echo "Installing other dependencies..."
+	$(UV) pip install --python $(VENV) -e ".[dev]"
 	@echo ""
 	@echo "✓ Development installation complete!"
 	@echo "  Run tests: make test"
